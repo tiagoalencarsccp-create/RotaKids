@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rota Kids — Transporte Escolar Seguro</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF613C;
+    --yellow: #FFC629;
+    --magenta: #D23EA7;
+    --navy: #1A2B6D;
+    --navy-dark: #0E1A45;
+    --blue-accent: #246BFD;
+    --white: #FFFFFF;
+    --gray-light: #F5F7FF;
+    --gray-mid: #E8ECF8;
+    --text-dark: #0E1A45;
+    --text-mid: #4A5580;
+    --text-light: #8892B8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    height: 68px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(26,43,109,0.08);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 22px;
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  .nav-logo-icon {
+    height: 40px; width: auto;
+    display: flex; align-items: center;
+  }
+
+  .nav-logo-img { height: 40px; width: auto; }
+
+  /* SEARCH MODAL OVERLAY */
+  .search-modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(10,18,50,0.7);
+    backdrop-filter: blur(6px);
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+  }
+
+  .search-modal-overlay.open { display: flex; animation: fadeInOverlay 0.25s ease; }
+
+  @keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .search-modal {
+    width: 100%; max-width: 1100px;
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+    animation: slideUpModal 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex;
+    max-height: calc(100vh - 100px);
+  }
+
+  @keyframes slideUpModal {
+    from { opacity: 0; transform: translateY(32px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* SIDEBAR FILTROS */
+  .sm-sidebar {
+    width: 260px; flex-shrink: 0;
+    background: var(--gray-light);
+    border-right: 1px solid var(--gray-mid);
+    padding: 28px 22px;
+    overflow-y: auto;
+  }
+
+  .sm-sidebar-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 17px;
+    color: var(--navy); margin-bottom: 4px;
+  }
+
+  .sm-sidebar-sub {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-light); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 24px;
+  }
+
+  .sm-filter-group { margin-bottom: 22px; }
+
+  .sm-filter-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    margin-bottom: 10px;
+  }
+
+  .sm-filter-icon { font-size: 16px; }
+
+  .sm-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .sm-tag {
+    padding: 5px 12px; border-radius: 50px;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--gray-mid);
+    color: var(--text-mid); cursor: pointer;
+    transition: all 0.15s; background: white;
+  }
+
+  .sm-tag.active, .sm-tag:hover {
+    border-color: var(--orange); color: var(--orange);
+    background: rgba(255,97,60,0.06);
+  }
+
+  .sm-checkbox {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-dark);
+    margin-bottom: 8px; cursor: pointer;
+  }
+
+  .sm-checkbox input { accent-color: var(--orange); width: 15px; height: 15px; }
+
+  .sm-range { width: 100%; accent-color: var(--orange); margin: 8px 0; }
+
+  .sm-range-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-light);
+  }
+
+  .sm-apply-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white; border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 10px;
+    font-family: 'Poppins', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .sm-apply-btn:hover { opacity: 0.9; }
+
+  /* MAIN RESULTS */
+  .sm-main {
+    flex: 1; overflow-y: auto; padding: 28px 28px 28px;
+  }
+
+  .sm-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 6px;
+  }
+
+  .sm-header-close {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gray-light); border: none;
+    font-size: 18px; cursor: pointer; color: var(--text-mid);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+  }
+  .sm-header-close:hover { background: var(--gray-mid); }
+
+  .sm-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 26px; color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .sm-subtitle { font-size: 14px; color: var(--text-mid); margin-bottom: 20px; }
+
+  .sm-sort-bar {
+    display: flex; justify-content: flex-end; margin-bottom: 18px;
+  }
+
+  .sm-sort-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 10px;
+    border: 1.5px solid var(--gray-mid);
+    background: white; font-size: 13px; font-weight: 600;
+    color: var(--text-mid); cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .sm-cards { display: flex; flex-direction: column; gap: 16px; }
+
+  .sm-driver-card {
+    background: white;
+    border: 1.5px solid var(--gray-mid);
+    border-radius: 18px; overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .sm-driver-card:hover {
+    box-shadow: 0 8px 32px rgba(26,43,109,0.12);
+    transform: translateY(-2px);
+  }
+
+  .sm-van-img {
+    width: 100%; height: 160px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--navy), #1e3a8a);
+    position: relative;
+  }
+
+  .sm-van-placeholder {
+    width: 100%; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px;
+    position: relative;
+  }
+
+  .sm-van-1 { background: linear-gradient(135deg, #0E1A45, #1A2B6D); }
+  .sm-van-2 { background: linear-gradient(135deg, #1A2B6D, #246BFD); }
+  .sm-van-3 { background: linear-gradient(135deg, #0E1A45, #D23EA7 120%); }
+
+  .sm-van-badge {
+    position: absolute; top: 12px; left: 12px;
+    padding: 5px 12px; border-radius: 50px;
+    font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  .badge-pro { background: linear-gradient(135deg, #FF613C, #FFC629); color: white; }
+  .badge-top { background: var(--navy); color: white; }
+
+  .sm-card-body { padding: 18px 20px; }
+
+  .sm-driver-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
+  }
+
+  .sm-driver-av {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+
+  .sm-driver-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 18px; color: var(--navy);
+  }
+
+  .sm-driver-exp { font-size: 12px; color: var(--text-light); }
+
+  .sm-driver-rating {
+    margin-left: auto; text-align: right;
+  }
+
+  .sm-rating-num {
+    font-size: 16px; font-weight: 800; color: var(--navy);
+  }
+
+  .sm-rating-count { font-size: 11px; color: var(--text-light); }
+
+  .sm-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+
+  .sm-info-item { }
+
+  .sm-info-label {
+    font-size: 10px; font-weight: 700; color: var(--text-light);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+  }
+
+  .sm-info-value { font-size: 13px; color: var(--text-dark); font-weight: 500; }
+
+  .sm-school-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+
+  .sm-school-tag {
+    font-size: 11px; font-weight: 600;
+    background: var(--gray-light); color: var(--text-mid);
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  .sm-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--gray-mid); padding-top: 14px;
+  }
+
+  .sm-price { }
+  .sm-price-label { font-size: 11px; color: var(--text-light); text-transform: uppercase; font-weight: 700; }
+  .sm-price-val {
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px; font-weight: 900;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sm-view-btn {
+    padding: 11px 24px; border-radius: 50px;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white; border: none; font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: 'Poppins', sans-serif;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .sm-view-btn:hover { opacity: 0.9; transform: scale(1.03); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    color: var(--text-mid);
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--orange); }
+
+  .nav-cta {
+    display: flex; gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 22px; border-radius: 50px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; border: none;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 2px solid var(--navy);
+    color: var(--navy);
+  }
+
+  .btn-outline:hover { background: var(--navy); color: white; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255,97,60,0.4);
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,97,60,0.5); }
+
+  .btn-large {
+    padding: 15px 36px;
+    font-size: 16px;
+    border-radius: 50px;
+  }
+
+  .btn-white {
+    background: white;
+    color: var(--orange);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-white:hover { transform: translateY(-2px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(150deg, var(--navy-dark) 0%, var(--navy) 50%, #1e3a8a 100%);
+    display: flex; align-items: center;
+    padding: 100px 5% 60px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(255,198,41,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(255,97,60,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(210,62,167,0.08) 0%, transparent 40%);
+  }
+
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,198,41,0.15);
+    border: 1px solid rgba(255,198,41,0.3);
+    padding: 6px 16px; border-radius: 50px;
+    font-size: 12px; font-weight: 600;
+    color: var(--yellow);
+    margin-bottom: 20px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--yellow);
+    animation: pulse-dot 1.5s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .hero h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1.1;
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, #FFC629, #FF613C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 17px; line-height: 1.7;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 36px;
+    max-width: 480px;
+  }
+
+  .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 48px;
+  }
+
+  .hero-stat { color: white; }
+  .hero-stat-num {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 32px;
+    background: linear-gradient(135deg, #FFC629, #FF613C);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-stat-lbl { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+  /* HERO VISUAL */
+  .hero-visual {
+    position: relative;
+    display: flex; justify-content: center; align-items: center;
+  }
+
+  .phone-mockup {
+    width: 280px;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+    overflow: hidden;
+    position: relative; z-index: 2;
+  }
+
+  .phone-statusbar {
+    background: var(--navy);
+    padding: 12px 20px 6px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .phone-statusbar span { font-size: 11px; color: white; font-weight: 600; }
+
+  .phone-topbar {
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    padding: 14px 16px;
+  }
+
+  .phone-topbar h4 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 16px; color: white; margin-bottom: 2px;
+  }
+
+  .phone-topbar p { font-size: 11px; color: rgba(255,255,255,0.8); }
+
+  .phone-body { padding: 14px; background: #F5F7FF; }
+
+  .phone-search {
+    background: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px; color: var(--text-light);
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-mid);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .phone-card {
+    background: white;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .phone-card-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+
+  .phone-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+
+  .phone-card-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+  .phone-card-sub { font-size: 10px; color: var(--text-light); }
+
+  .phone-verified {
+    margin-left: auto;
+    background: #E8F5E9; color: #2E7D32;
+    font-size: 9px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .phone-stars { color: #FFC629; font-size: 10px; }
+
+  .phone-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .phone-tag {
+    font-size: 9px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+  }
+
+  .tag-blue { background: #E3F2FD; color: #1565C0; }
+  .tag-orange { background: #FFF3E0; color: #E65100; }
+
+  .phone-btn-cta {
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white; border: none; border-radius: 10px;
+    width: 100%; padding: 10px;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+  }
+
+  /* Floating elements */
+  .float-card {
+    position: absolute;
+    background: white;
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    font-size: 12px; font-weight: 600;
+    color: var(--text-dark);
+    z-index: 3;
+  }
+
+  .float-card-1 { top: 10%; right: -20px; animation: float1 3s ease-in-out infinite; }
+  .float-card-2 { bottom: 15%; left: -30px; animation: float2 3.5s ease-in-out infinite; }
+
+  @keyframes float1 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(8px); }
+  }
+
+  .float-icon { font-size: 20px; margin-bottom: 4px; }
+  .float-label { font-size: 11px; color: var(--text-light); font-weight: 400; }
+
+  /* SECTIONS */
+  section { padding: 80px 5%; }
+
+  .section-center { text-align: center; }
+
+  .section-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(255,97,60,0.1), rgba(255,198,41,0.1));
+    border: 1px solid rgba(255,97,60,0.2);
+    color: var(--orange);
+    font-size: 12px; font-weight: 700;
+    padding: 5px 16px; border-radius: 50px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: clamp(28px, 4vw, 42px);
+    color: var(--navy); line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px; color: var(--text-mid);
+    line-height: 1.7; max-width: 560px; margin: 0 auto;
+  }
+
+  /* HOW IT WORKS */
+  .how-bg { background: var(--gray-light); }
+
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 24px; margin-top: 56px;
+    max-width: 1100px; margin-left: auto; margin-right: auto;
+  }
+
+  .step-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px 22px;
+    text-align: center;
+    box-shadow: 0 2px 20px rgba(26,43,109,0.07);
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .step-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(26,43,109,0.14); }
+
+  .step-num {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white; font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .step-icon {
+    width: 60px; height: 60px; border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255,97,60,0.1), rgba(255,198,41,0.1));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 14px auto 16px;
+  }
+
+  .step-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .step-desc { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    max-width: 1100px; margin: 56px auto 0;
+  }
+
+  .features-list { display: flex; flex-direction: column; gap: 20px; }
+
+  .feature-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 20px; border-radius: 16px;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .feature-item:hover { background: var(--gray-light); }
+
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+
+  .feature-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .feature-desc { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+  .features-visual {
+    background: linear-gradient(150deg, var(--navy-dark), var(--navy));
+    border-radius: 28px;
+    padding: 36px 28px;
+    position: relative; overflow: hidden;
+  }
+
+  .features-visual::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,198,41,0.2), transparent 70%);
+  }
+
+  .fv-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 20px; color: white;
+    margin-bottom: 6px;
+  }
+  .fv-sub { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 24px; }
+
+  .fv-doc-item {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+
+  .fv-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: white; flex-shrink: 0;
+  }
+
+  .fv-doc-name { font-size: 13px; color: white; font-weight: 500; }
+  .fv-doc-ok { margin-left: auto; font-size: 11px; color: #4CAF50; font-weight: 600; }
+
+  .fv-guarantee {
+    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(255,97,60,0.2), rgba(255,198,41,0.1));
+    border: 1px solid rgba(255,198,41,0.2);
+    border-radius: 14px; padding: 16px;
+  }
+
+  .fv-guarantee-title { font-size: 14px; font-weight: 700; color: var(--yellow); margin-bottom: 4px; }
+  .fv-guarantee-desc { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+
+  /* DRIVER PROFILE */
+  .profile-section { background: var(--gray-light); }
+
+  .profile-card {
+    max-width: 900px; margin: 56px auto 0;
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(26,43,109,0.1);
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    padding: 32px 36px;
+    display: flex; align-items: center; gap: 24px;
+    position: relative; overflow: hidden;
+  }
+
+  .profile-header::after {
+    content: '';
+    position: absolute; top: -50%; right: -10%;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,198,41,0.15), transparent 70%);
+  }
+
+  .profile-av {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 900; color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(255,97,60,0.4);
+  }
+
+  .profile-info h3 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 24px; color: white; margin-bottom: 4px;
+  }
+
+  .profile-info p { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
+
+  .profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .profile-badge {
+    font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 50px;
+  }
+
+  .pb-green { background: rgba(76,175,80,0.2); color: #81C784; }
+  .pb-yellow { background: rgba(255,198,41,0.2); color: var(--yellow); }
+
+  .profile-stats-bar {
+    display: flex;
+    border-bottom: 1px solid var(--gray-mid);
+  }
+
+  .profile-stat-item {
+    flex: 1; text-align: center; padding: 20px;
+    border-right: 1px solid var(--gray-mid);
+  }
+  .profile-stat-item:last-child { border-right: none; }
+
+  .psi-num {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: 26px;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .psi-label { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+  .profile-body {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .profile-col { padding: 28px 32px; }
+  .profile-col:first-child { border-right: 1px solid var(--gray-mid); }
+
+  .profile-col-title {
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-light); margin-bottom: 14px;
+  }
+
+  .doc-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-mid);
+    font-size: 14px; color: var(--text-dark);
+  }
+  .doc-row:last-child { border-bottom: none; }
+
+  .doc-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white; flex-shrink: 0;
+  }
+
+  .amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .amenity-chip {
+    background: var(--gray-light);
+    border-radius: 10px; padding: 10px 12px;
+    font-size: 13px; font-weight: 500; color: var(--text-dark);
+    text-align: center;
+  }
+
+  .profile-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--gray-mid);
+    display: flex; gap: 12px; align-items: center;
+  }
+
+  .price-badge {
+    background: linear-gradient(135deg, rgba(255,97,60,0.08), rgba(255,198,41,0.08));
+    border: 1px solid rgba(255,97,60,0.15);
+    border-radius: 12px; padding: 10px 18px;
+    font-size: 13px; color: var(--text-mid);
+  }
+
+  .price-badge strong {
+    font-size: 20px; font-weight: 800; color: var(--orange);
+    display: block;
+  }
+
+  /* REVIEWS */
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin-top: 48px;
+    max-width: 1100px; margin-left: auto; margin-right: auto;
+  }
+
+  .review-card {
+    background: white;
+    border-radius: 20px; padding: 24px;
+    box-shadow: 0 2px 20px rgba(26,43,109,0.07);
+    transition: transform 0.3s;
+  }
+
+  .review-card:hover { transform: translateY(-4px); }
+
+  .review-stars { color: #FFC629; font-size: 14px; margin-bottom: 12px; }
+
+  .review-text {
+    font-size: 14px; color: var(--text-mid);
+    line-height: 1.7; margin-bottom: 18px;
+    font-style: italic;
+  }
+
+  .review-author { display: flex; align-items: center; gap: 10px; }
+
+  .review-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #D23EA7, #246BFD);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+  }
+
+  .review-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .review-city { font-size: 11px; color: var(--text-light); }
+
+  /* CTA BANNER */
+  .cta-banner {
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy), #1e3a8a);
+    padding: 80px 5%;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+
+  .cta-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(255,97,60,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(255,198,41,0.12) 0%, transparent 50%);
+  }
+
+  .cta-banner h2 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: clamp(28px, 4vw, 44px);
+    color: white; margin-bottom: 16px;
+    position: relative;
+  }
+
+  .cta-banner p {
+    font-size: 17px; color: rgba(255,255,255,0.7);
+    max-width: 520px; margin: 0 auto 36px;
+    line-height: 1.7; position: relative;
+  }
+
+  .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy-dark);
+    padding: 48px 5% 28px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px; margin-bottom: 40px;
+    max-width: 1100px; margin-left: auto; margin-right: auto;
+  }
+
+  .footer-brand p {
+    font-size: 14px; line-height: 1.7; margin-top: 12px;
+    color: rgba(255,255,255,0.5);
+    max-width: 260px;
+  }
+
+  .footer-col-title {
+    font-size: 13px; font-weight: 700;
+    color: white; margin-bottom: 14px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 8px; }
+
+  .footer-col ul li a {
+    font-size: 14px; color: rgba(255,255,255,0.5);
+    text-decoration: none; transition: color 0.2s;
+  }
+
+  .footer-col ul li a:hover { color: var(--yellow); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px;
+    max-width: 1100px; margin: 0 auto;
+  }
+
+  .footer-bottom-right { color: rgba(255,255,255,0.4); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-content > * {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .hero-badge { animation-delay: 0.1s; }
+  .hero h1 { animation-delay: 0.2s; }
+  .hero p { animation-delay: 0.3s; }
+  .hero-buttons { animation-delay: 0.4s; }
+  .hero-stats { animation-delay: 0.5s; }
+
+  /* SEARCH BAR */
+  .search-section {
+    background: white;
+    padding: 0 5%;
+    margin-top: -1px;
+  }
+
+  .search-bar {
+    max-width: 800px; margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 50px rgba(26,43,109,0.15);
+    display: flex; gap: 12px; align-items: flex-end;
+    transform: translateY(-50%);
+    border: 1px solid var(--gray-mid);
+  }
+
+  .search-field { flex: 1; }
+  .search-label { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .search-input {
+    width: 100%; border: 1.5px solid var(--gray-mid);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 14px; color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+    outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--orange); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-visual { display: none; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .profile-body { grid-template-columns: 1fr; }
+    .profile-col:first-child { border-right: none; border-bottom: 1px solid var(--gray-mid); }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .search-bar { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg height="42" viewBox="0 0 210 65" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="kG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFC629"/><stop offset="50%" stop-color="#FF613C"/><stop offset="100%" stop-color="#D23EA7"/></linearGradient>
+        <linearGradient id="bG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FF613C"/><stop offset="100%" stop-color="#D23EA7"/></linearGradient>
+        <linearGradient id="lG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFC629"/><stop offset="100%" stop-color="#FF613C"/></linearGradient>
+      </defs>
+      <circle cx="50" cy="11" r="7" fill="#246BFD"/>
+      <path d="M36 17 Q41 21 47 31 Q43 41 36 53" stroke="url(#bG)" stroke-width="9" stroke-linecap="round" fill="none"/>
+      <path d="M47 31 Q55 23 63 15" stroke="url(#lG)" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <path d="M47 31 Q57 41 65 53" stroke="url(#kG)" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <text x="70" y="37" font-family="Nunito,sans-serif" font-weight="900" font-size="21" fill="#1A2B6D">ROTA </text>
+      <text x="128" y="37" font-family="Nunito,sans-serif" font-weight="900" font-size="21" fill="url(#kG)">ids</text>
+    </svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#segurança">Segurança</a></li>
+    <li><a href="#motoristas">Motoristas</a></li>
+    <li><a href="#depoimentos">Depoimentos</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn btn-outline">Entrar</a>
+    <a href="#cadastro" class="btn btn-primary">Cadastrar grátis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Transporte escolar verificado
+      </div>
+      <h1>O filho vai <span>seguro.</span><br>Você vai tranquilo.</h1>
+      <p>Marketplace que conecta famílias a motoristas de van escolar verificados, documentados e avaliados pela comunidade. Grátis para motoristas.</p>
+      <div class="hero-buttons">
+        <button onclick="openSearchModal()" class="btn btn-primary btn-large">Encontrar motorista</button>
+        <button onclick="openDriverModal()" class="btn btn-white btn-large">Sou motorista</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">1.200+</div>
+          <div class="hero-stat-lbl">motoristas cadastrados</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">8.400</div>
+          <div class="hero-stat-lbl">crianças transportadas</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">4.9★</div>
+          <div class="hero-stat-lbl">avaliação média</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-card float-card-1">
+        <div class="float-icon">🛡️</div>
+        <div style="font-weight:700;font-size:13px;">Documentos verificados</div>
+        <div class="float-label">100% dos motoristas</div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-statusbar">
+          <span>9:41</span>
+          <span>●●●</span>
+        </div>
+        <div class="phone-topbar">
+          <h4>Rota Kids</h4>
+          <p>Encontre transporte seguro</p>
+        </div>
+        <div class="phone-body">
+          <div class="phone-search">
+            🔍 Escola Municipal Padre Cícero...
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#8892B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Motoristas próximos</div>
+
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-avatar">CR</div>
+              <div>
+                <div class="phone-card-name">Carlos Rocha</div>
+                <div class="phone-stars">★★★★★ <span style="color:#8892B8;font-size:9px;">4.9 · 128 avaliações</span></div>
+              </div>
+              <span class="phone-verified">✓ Verificado</span>
+            </div>
+            <div class="phone-tags">
+              <span class="phone-tag tag-blue">Cobre seu bairro</span>
+              <span class="phone-tag tag-orange">2 vagas</span>
+            </div>
+            <button class="phone-btn-cta">Ver perfil e contato</button>
+          </div>
+
+          <div class="phone-card" style="opacity:0.7;">
+            <div class="phone-card-row">
+              <div class="phone-avatar" style="background:linear-gradient(135deg,#D23EA7,#246BFD);">MS</div>
+              <div>
+                <div class="phone-card-name">Maria Santos</div>
+                <div class="phone-stars">★★★★★ <span style="color:#8892B8;font-size:9px;">4.8 · 84</span></div>
+              </div>
+              <span class="phone-verified">✓ Verificado</span>
+            </div>
+            <div class="phone-tags">
+              <span class="phone-tag tag-blue">Cobre seu bairro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-card float-card-2">
+        <div class="float-icon">📍</div>
+        <div style="font-weight:700;font-size:13px;">GPS em tempo real</div>
+        <div class="float-label">Acompanhe a rota</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH BAR -->
+<div class="search-section" id="buscar">
+  <div class="search-bar">
+    <div class="search-field">
+      <div class="search-label">Escola do seu filho</div>
+      <input type="text" class="search-input" placeholder="Nome da escola ou bairro...">
+    </div>
+    <div class="search-field">
+      <div class="search-label">Cidade</div>
+      <input type="text" class="search-input" placeholder="Sua cidade...">
+    </div>
+    <button onclick="openSearchModal()" class="btn btn-primary" style="padding: 11px 28px; border-radius: 10px; white-space: nowrap;">Buscar motoristas</button>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-bg" id="como-funciona" style="padding-top: 40px;">
+  <div class="section-center">
+    <div class="section-badge">Como funciona</div>
+    <h2 class="section-title">Simples para todos os lados</h2>
+    <p class="section-sub">Conectamos famílias e motoristas com segurança, transparência e sem burocracia.</p>
+  </div>
+
+  <div class="steps-grid" style="margin-top: 48px;">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-icon">📋</div>
+      <div class="step-title">Motorista se cadastra</div>
+      <div class="step-desc">Gratuito. Preenche dados, envia documentos e define as rotas atendidas.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-icon">🛡️</div>
+      <div class="step-title">Verificação completa</div>
+      <div class="step-desc">CNH, vistoria do veículo, antecedentes criminais e seguro são validados pela plataforma.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-icon">🔍</div>
+      <div class="step-title">Família encontra</div>
+      <div class="step-desc">Busca por escola ou bairro, vê perfil completo, avaliações e entra em contato.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-icon">📄</div>
+      <div class="step-title">Contrato formal</div>
+      <div class="step-desc">Tudo documentado. Contrato digital gerado pela plataforma, protegendo ambas as partes.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES / SECURITY -->
+<section id="segurança">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-badge">Segurança em primeiro lugar</div>
+    <h2 class="section-title">A plataforma mais segura<br>para o transporte escolar</h2>
+  </div>
+
+  <div class="features-grid">
+    <div class="features-list">
+      <div class="feature-item">
+        <div class="feature-icon">🪪</div>
+        <div>
+          <div class="feature-title">Verificação de documentos</div>
+          <div class="feature-desc">CNH categoria D, antecedentes criminais, vistoria do veículo e seguro escolar obrigatório validados antes da publicação do perfil.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⭐</div>
+        <div>
+          <div class="feature-title">Avaliações verificadas</div>
+          <div class="feature-desc">Apenas famílias que contrataram podem avaliar. Sem reviews falsos — transparência real para quem decide.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📍</div>
+        <div>
+          <div class="feature-title">Acompanhamento em tempo real</div>
+          <div class="feature-desc">GPS integrado para que os pais saibam onde a van está. Notificação de chegada e saída da escola.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📄</div>
+        <div>
+          <div class="feature-title">Contrato digital</div>
+          <div class="feature-desc">Tudo formalizado. O contrato gerado pela plataforma protege motorista e família com validade legal.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-visual">
+      <div class="fv-title">Perfil verificado ✓</div>
+      <div class="fv-sub">Todos os documentos em dia</div>
+
+      <div class="fv-doc-item">
+        <div class="fv-check">✓</div>
+        <div class="fv-doc-name">CNH Categoria D</div>
+        <div class="fv-doc-ok">Válida</div>
+      </div>
+      <div class="fv-doc-item">
+        <div class="fv-check">✓</div>
+        <div class="fv-doc-name">Vistoria do Veículo</div>
+        <div class="fv-doc-ok">Aprovada</div>
+      </div>
+      <div class="fv-doc-item">
+        <div class="fv-check">✓</div>
+        <div class="fv-doc-name">Antecedentes Criminais</div>
+        <div class="fv-doc-ok">Limpo</div>
+      </div>
+      <div class="fv-doc-item">
+        <div class="fv-check">✓</div>
+        <div class="fv-doc-name">Seguro Escolar</div>
+        <div class="fv-doc-ok">Ativo</div>
+      </div>
+      <div class="fv-doc-item">
+        <div class="fv-check">✓</div>
+        <div class="fv-doc-name">Curso Defesa Pessoal</div>
+        <div class="fv-doc-ok">Certificado</div>
+      </div>
+
+      <div class="fv-guarantee">
+        <div class="fv-guarantee-title">🛡️ Garantia Rota Kids</div>
+        <div class="fv-guarantee-desc">Todos os motoristas passam por verificação rigorosa de documentos e vistoria veicular a cada 6 meses.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DRIVER PROFILE PREVIEW -->
+<section class="profile-section" id="motoristas">
+  <div class="section-center">
+    <div class="section-badge">Perfil do motorista</div>
+    <h2 class="section-title">Transparência total para as famílias</h2>
+    <p class="section-sub">Cada motorista tem um perfil completo com documentos, rotas, preços e avaliações reais.</p>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-av">CR</div>
+      <div class="profile-info">
+        <h3>Carlos Rocha <span style="font-size:14px;background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:20px;font-weight:500;">ID: RK-2944</span></h3>
+        <p>Juazeiro do Norte, CE · 8 anos de experiência</p>
+        <div class="profile-badges">
+          <span class="profile-badge pb-green">✓ Documentos verificados</span>
+          <span class="profile-badge pb-yellow">★ 4.9 · 128 avaliações</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-stats-bar">
+      <div class="profile-stat-item">
+        <div class="psi-num">4.9</div>
+        <div class="psi-label">Avaliação</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-num">47</div>
+        <div class="psi-label">Alunos ativos</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-num">8</div>
+        <div class="psi-label">Anos de experiência</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-num">3</div>
+        <div class="psi-label">Escolas cobertas</div>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="profile-col">
+        <div class="profile-col-title">Qualificações</div>
+        <div class="doc-row"><div class="doc-check">✓</div> CNH Categoria D Profissional</div>
+        <div class="doc-row"><div class="doc-check">✓</div> Curso de Condução Defensiva</div>
+        <div class="doc-row"><div class="doc-check">✓</div> Primeiros Socorros e RCP</div>
+        <div class="doc-row"><div class="doc-check">✓</div> Seguro Escolar Ativo</div>
+        <div class="doc-row"><div class="doc-check">✓</div> Antecedentes Limpos</div>
+      </div>
+      <div class="profile-col">
+        <div class="profile-col-title">Comodidades do veículo</div>
+        <div class="amenity-grid">
+          <div class="amenity-chip">❄️ Ar condicionado</div>
+          <div class="amenity-chip">📍 GPS ao vivo</div>
+          <div class="amenity-chip">📷 Câmera interna</div>
+          <div class="amenity-chip">🪑 Cadeirinha</div>
+          <div class="amenity-chip">🔒 Cinto 3 pontos</div>
+          <div class="amenity-chip">📱 App rastreio</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-footer">
+      <div class="price-badge">
+        <strong>R$ 280/mês</strong>
+        por aluno · ida e volta
+      </div>
+      <div style="flex:1"></div>
+      <a href="#" class="btn btn-outline">Ver perfil completo</a>
+      <a href="#" class="btn btn-primary">Solicitar orçamento</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="depoimentos">
+  <div class="section-center">
+    <div class="section-badge">Depoimentos</div>
+    <h2 class="section-title">O que as famílias dizem</h2>
+    <p class="section-sub">Mais de 8.000 crianças transportadas com segurança todos os dias.</p>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Encontrei o Carlos em menos de 5 minutos. Ver os documentos dele verificados na plataforma me deu uma segurança enorme. Minha filha adora a van."</div>
+      <div class="review-author">
+        <div class="review-av">SJ</div>
+        <div>
+          <div class="review-name">Sarah Jenkins</div>
+          <div class="review-city">Juazeiro do Norte, CE</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Muito profissional. O acompanhamento por GPS em tempo real é incrível — sei exatamente quando meu filho saiu da escola sem precisar ligar toda vez."</div>
+      <div class="review-author">
+        <div class="review-av" style="background:linear-gradient(135deg,#FF613C,#FFC629);">MC</div>
+        <div>
+          <div class="review-name">Michael Chen</div>
+          <div class="review-city">Fortaleza, CE</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Como motorista, o cadastro foi simples e gratuito. Em duas semanas já tinha 12 novos contratos fechados pela plataforma. Recomendo muito."</div>
+      <div class="review-author">
+        <div class="review-av" style="background:linear-gradient(135deg,#246BFD,#D23EA7);">RP</div>
+        <div>
+          <div class="review-name">Ricardo Pereira</div>
+          <div class="review-city">Crato, CE · Motorista</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner" id="cadastro">
+  <h2>Pronto para começar?</h2>
+  <p>Motoristas se cadastram gratuitamente. Famílias encontram transporte seguro em minutos.</p>
+  <div class="cta-btns">
+    <a href="#" class="btn btn-primary btn-large">Sou família — buscar motorista</a>
+    <button onclick="openDriverModal()" class="btn btn-white btn-large" id="cadastro-motorista">Sou motorista — me cadastrar grátis</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo" style="color:white;display:flex;align-items:center;gap:8px;">
+        <div class="nav-logo-icon">K</div>
+        <span style="font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;">Rota Kids</span>
+      </div>
+      <p>Marketplace de transporte escolar seguro. Conectando famílias e motoristas verificados no Brasil.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Plataforma</div>
+      <ul>
+        <li><a href="#">Como funciona</a></li>
+        <li><a href="#">Para famílias</a></li>
+        <li><a href="#">Para motoristas</a></li>
+        <li><a href="#">Preços</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Segurança</div>
+      <ul>
+        <li><a href="#">Verificação</a></li>
+        <li><a href="#">Garantia RK</a></li>
+        <li><a href="#">Contrato digital</a></li>
+        <li><a href="#">Central de ajuda</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Empresa</div>
+      <ul>
+        <li><a href="#">Sobre nós</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contato</a></li>
+        <li><a href="#">Privacidade</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Rota Kids. Todos os direitos reservados.</span>
+    <span class="footer-bottom-right">Movendo a próxima geração com segurança.</span>
+  </div>
+</footer>
+
+<!-- SEARCH MODAL -->
+<div class="search-modal-overlay" id="searchModal" onclick="handleOverlayClick(event)">
+  <div class="search-modal">
+
+    <!-- SIDEBAR FILTROS -->
+    <div class="sm-sidebar">
+      <div class="sm-sidebar-title">Filtrar Busca</div>
+      <div class="sm-sidebar-sub">Refinar resultados</div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">📍</span> Bairros</div>
+        <div class="sm-tags">
+          <span class="sm-tag active" onclick="toggleTag(this)">Centro</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Pirajá</span>
+          <span class="sm-tag" onclick="toggleTag(this)">João Cabral</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Franciscanos</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Lagoa Seca</span>
+        </div>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🏫</span> Escolas</div>
+        <label class="sm-checkbox"><input type="checkbox" checked> E.M. Padre Cícero</label>
+        <label class="sm-checkbox"><input type="checkbox"> Colégio Dom Expedito</label>
+        <label class="sm-checkbox"><input type="checkbox"> E.E. Governador Adauto</label>
+        <label class="sm-checkbox"><input type="checkbox"> Colégio Santa Cecília</label>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">💰</span> Preço por mês</div>
+        <input type="range" class="sm-range" min="50" max="500" value="300" id="priceRange" oninput="document.getElementById('priceVal').textContent='R$ '+this.value">
+        <div class="sm-range-labels"><span>R$ 50</span><span id="priceVal">R$ 300</span><span>R$ 500+</span></div>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🕐</span> Disponibilidade</div>
+        <div class="sm-tags">
+          <span class="sm-tag active" onclick="toggleTag(this)">Manhã</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Tarde</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Integral</span>
+        </div>
+      </div>
+
+      <button class="sm-apply-btn">Aplicar Filtros</button>
+    </div>
+
+    <!-- MAIN RESULTS -->
+    <div class="sm-main">
+      <div class="sm-header">
+        <div>
+          <div class="sm-title">Motoristas disponíveis</div>
+          <div class="sm-subtitle">Encontre transporte confiável para seus filhos. Todos verificados.</div>
+        </div>
+        <button class="sm-header-close" onclick="closeSearchModal()">✕</button>
+      </div>
+
+      <div class="sm-sort-bar">
+        <button class="sm-sort-btn">⇅ Ordenar por avaliação</button>
+      </div>
+
+      <div class="sm-cards">
+
+        <!-- Card 1 -->
+        <div class="sm-driver-card">
+          <div class="sm-van-placeholder sm-van-1">
+            🚐
+            <span class="sm-van-badge badge-pro">✓ Verificado Pro</span>
+          </div>
+          <div class="sm-card-body">
+            <div class="sm-driver-row">
+              <div class="sm-driver-av" style="background:linear-gradient(135deg,#FF613C,#FFC629);">RM</div>
+              <div>
+                <div class="sm-driver-name">Ricardo Mendes</div>
+                <div class="sm-driver-exp">8 anos de experiência</div>
+              </div>
+              <div class="sm-driver-rating">
+                <div class="sm-rating-num">⭐ 4.9</div>
+                <div class="sm-rating-count">(128 avaliações)</div>
+              </div>
+            </div>
+            <div class="sm-info-grid">
+              <div class="sm-info-item">
+                <div class="sm-info-label">🏫 Escolas atendidas</div>
+                <div class="sm-school-tags">
+                  <span class="sm-school-tag">E.M. Padre Cícero</span>
+                  <span class="sm-school-tag">Santa Cecília</span>
+                </div>
+              </div>
+              <div class="sm-info-item">
+                <div class="sm-info-label">👥 Capacidade</div>
+                <div class="sm-info-value">12 crianças máx <span style="color:#2E7D32;font-size:11px;">(4 vagas)</span></div>
+              </div>
+            </div>
+            <div class="sm-card-footer">
+              <div class="sm-price">
+                <div class="sm-price-label">Mensalidade</div>
+                <div class="sm-price-val">R$ 280,00</div>
+              </div>
+              <button class="sm-view-btn">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="sm-driver-card">
+          <div class="sm-van-placeholder sm-van-2">
+            🚌
+            <span class="sm-van-badge badge-top">⭐ Mais bem avaliado</span>
+          </div>
+          <div class="sm-card-body">
+            <div class="sm-driver-row">
+              <div class="sm-driver-av" style="background:linear-gradient(135deg,#246BFD,#D23EA7);">ES</div>
+              <div>
+                <div class="sm-driver-name">Elena Sanchez</div>
+                <div class="sm-driver-exp">12 anos de experiência</div>
+              </div>
+              <div class="sm-driver-rating">
+                <div class="sm-rating-num">⭐ 4.7</div>
+                <div class="sm-rating-count">(94 avaliações)</div>
+              </div>
+            </div>
+            <div class="sm-info-grid">
+              <div class="sm-info-item">
+                <div class="sm-info-label">🏫 Escolas atendidas</div>
+                <div class="sm-school-tags">
+                  <span class="sm-school-tag">Dom Expedito</span>
+                  <span class="sm-school-tag">Adauto Bezerra</span>
+                </div>
+              </div>
+              <div class="sm-info-item">
+                <div class="sm-info-label">👥 Capacidade</div>
+                <div class="sm-info-value" style="color:#C62828;">15 crianças <span style="font-size:11px;">(Lotado)</span></div>
+              </div>
+            </div>
+            <div class="sm-card-footer">
+              <div class="sm-price">
+                <div class="sm-price-label">Mensalidade</div>
+                <div class="sm-price-val">R$ 310,00</div>
+              </div>
+              <button class="sm-view-btn">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="sm-driver-card">
+          <div class="sm-van-placeholder sm-van-3">
+            🚐
+          </div>
+          <div class="sm-card-body">
+            <div class="sm-driver-row">
+              <div class="sm-driver-av" style="background:linear-gradient(135deg,#0E1A45,#246BFD);">MP</div>
+              <div>
+                <div class="sm-driver-name">Marco Polo</div>
+                <div class="sm-driver-exp">5 anos de experiência</div>
+              </div>
+              <div class="sm-driver-rating">
+                <div class="sm-rating-num">⭐ 4.8</div>
+                <div class="sm-rating-count">(42 avaliações)</div>
+              </div>
+            </div>
+            <div class="sm-info-grid">
+              <div class="sm-info-item">
+                <div class="sm-info-label">🏫 Escolas atendidas</div>
+                <div class="sm-school-tags">
+                  <span class="sm-school-tag">E.M. Padre Cícero</span>
+                </div>
+              </div>
+              <div class="sm-info-item">
+                <div class="sm-info-label">👥 Capacidade</div>
+                <div class="sm-info-value">10 crianças máx <span style="color:#2E7D32;font-size:11px;">(2 vagas)</span></div>
+              </div>
+            </div>
+            <div class="sm-card-footer">
+              <div class="sm-price">
+                <div class="sm-price-label">Mensalidade</div>
+                <div class="sm-price-val">R$ 250,00</div>
+              </div>
+              <button class="sm-view-btn">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL DE BUSCA DE MOTORISTAS
+     ============================================================ -->
+<div class="search-modal-overlay" id="searchModal" onclick="handleOverlayClick(event,'searchModal')">
+  <div class="search-modal">
+    <div class="sm-sidebar">
+      <div class="sm-sidebar-title">Filtrar Busca</div>
+      <div class="sm-sidebar-sub">Refinar resultados</div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🗺️</span> Estado</div>
+        <select class="rk-select" id="f-estado" onchange="onEstadoChange()">
+          <option value="">Selecione o estado</option>
+        </select>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🏙️</span> Cidade</div>
+        <select class="rk-select" id="f-cidade" onchange="onCidadeChange()" disabled>
+          <option value="">Selecione a cidade</option>
+        </select>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">📍</span> Bairro</div>
+        <select class="rk-select" id="f-bairro" onchange="onBairroChange()" disabled>
+          <option value="">Selecione o bairro</option>
+        </select>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🏫</span> Escola</div>
+        <select class="rk-select" id="f-escola" disabled>
+          <option value="">Selecione a escola</option>
+        </select>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">💰</span> Preço máximo/mês</div>
+        <input type="range" class="sm-range" min="100" max="800" value="400" id="priceRange" oninput="document.getElementById('priceVal').textContent='R$ '+this.value">
+        <div class="sm-range-labels"><span>R$ 100</span><span id="priceVal">R$ 400</span><span>R$ 800</span></div>
+      </div>
+
+      <div class="sm-filter-group">
+        <div class="sm-filter-label"><span class="sm-filter-icon">🕐</span> Turno</div>
+        <div class="sm-tags">
+          <span class="sm-tag active" onclick="toggleTag(this)">Manhã</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Tarde</span>
+          <span class="sm-tag" onclick="toggleTag(this)">Integral</span>
+        </div>
+      </div>
+
+      <button class="sm-apply-btn" onclick="applyFilters()">🔍 Buscar Motoristas</button>
+    </div>
+
+    <div class="sm-main">
+      <div class="sm-header">
+        <div>
+          <div class="sm-title">Motoristas disponíveis</div>
+          <div class="sm-subtitle">Todos verificados com documentos validados pela Rota Kids.</div>
+        </div>
+        <button class="sm-header-close" onclick="closeSearchModal()">✕</button>
+      </div>
+      <div class="sm-sort-bar">
+        <button class="sm-sort-btn">⇅ Ordenar por avaliação</button>
+      </div>
+      <div class="sm-cards" id="driverCards">
+        <!-- cards rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL CADASTRO DO MOTORISTA
+     ============================================================ -->
+<div class="search-modal-overlay" id="driverModal" onclick="handleOverlayClick(event,'driverModal')">
+  <div class="driver-modal">
+    <!-- HEADER -->
+    <div class="dm-header">
+      <div>
+        <div class="dm-title">Cadastro do Motorista</div>
+        <div class="dm-sub">Gratuito · Comece a receber famílias em minutos</div>
+      </div>
+      <button class="sm-header-close" onclick="closeDriverModal()" style="background:rgba(255,255,255,0.15);color:white;">✕</button>
+    </div>
+
+    <!-- STEPS BAR -->
+    <div class="dm-steps">
+      <div class="dm-step active" id="step-dot-1"><span>1</span><small>Pessoal</small></div>
+      <div class="dm-step-line"></div>
+      <div class="dm-step" id="step-dot-2"><span>2</span><small>Veículo</small></div>
+      <div class="dm-step-line"></div>
+      <div class="dm-step" id="step-dot-3"><span>3</span><small>Rotas</small></div>
+      <div class="dm-step-line"></div>
+      <div class="dm-step" id="step-dot-4"><span>4</span><small>Documentos</small></div>
+    </div>
+
+    <!-- FORM BODY -->
+    <div class="dm-body">
+
+      <!-- STEP 1: DADOS PESSOAIS -->
+      <div class="dm-step-content" id="dm-step-1">
+        <div class="dm-section-title">Dados pessoais</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Nome completo *</label>
+            <input type="text" class="dm-input" placeholder="Seu nome completo">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">CPF *</label>
+            <input type="text" class="dm-input" placeholder="000.000.000-00" maxlength="14">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Data de nascimento *</label>
+            <input type="date" class="dm-input">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Telefone / WhatsApp *</label>
+            <input type="tel" class="dm-input" placeholder="(00) 90000-0000">
+          </div>
+          <div class="dm-field" style="grid-column:1/-1">
+            <label class="dm-label">E-mail *</label>
+            <input type="email" class="dm-input" placeholder="seuemail@exemplo.com">
+          </div>
+        </div>
+
+        <div class="dm-section-title" style="margin-top:22px;">Endereço</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Estado *</label>
+            <select class="dm-input" id="dr-estado" onchange="onDrEstadoChange()">
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Cidade *</label>
+            <select class="dm-input" id="dr-cidade" onchange="onDrCidadeChange()" disabled>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Bairro *</label>
+            <select class="dm-input" id="dr-bairro" disabled>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">CEP</label>
+            <input type="text" class="dm-input" placeholder="00000-000">
+          </div>
+          <div class="dm-field" style="grid-column:1/-1">
+            <label class="dm-label">Endereço completo</label>
+            <input type="text" class="dm-input" placeholder="Rua, número, complemento">
+          </div>
+        </div>
+        <div class="dm-section-title" style="margin-top:22px;">Acesso à plataforma</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Senha *</label>
+            <input type="password" class="dm-input" placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Confirmar senha *</label>
+            <input type="password" class="dm-input" placeholder="Repita a senha">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: VEÍCULO -->
+      <div class="dm-step-content" id="dm-step-2" style="display:none;">
+        <div class="dm-section-title">Dados do veículo</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Tipo de veículo *</label>
+            <select class="dm-input">
+              <option value="">Selecione</option>
+              <option>Van Escolar</option>
+              <option>Micro-ônibus</option>
+              <option>Kombi</option>
+              <option>SUV / Minivan</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Marca *</label>
+            <select class="dm-input">
+              <option value="">Selecione</option>
+              <option>Mercedes-Benz Sprinter</option>
+              <option>Volkswagen Kombi</option>
+              <option>Ford Transit</option>
+              <option>Renault Master</option>
+              <option>Fiat Ducato</option>
+              <option>Outra</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Modelo *</label>
+            <input type="text" class="dm-input" placeholder="Ex: Sprinter 415">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Ano de fabricação *</label>
+            <input type="number" class="dm-input" placeholder="Ex: 2019" min="2000" max="2025">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Placa *</label>
+            <input type="text" class="dm-input" placeholder="AAA-0000" maxlength="8">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Capacidade de alunos *</label>
+            <input type="number" class="dm-input" placeholder="Ex: 12" min="1" max="30">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Cor do veículo</label>
+            <input type="text" class="dm-input" placeholder="Ex: Branco">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Renavam</label>
+            <input type="text" class="dm-input" placeholder="00000000000">
+          </div>
+        </div>
+
+        <div class="dm-section-title" style="margin-top:22px;">Comodidades do veículo</div>
+        <div class="dm-checkgrid">
+          <label class="dm-checkitem"><input type="checkbox"> ❄️ Ar-condicionado</label>
+          <label class="dm-checkitem"><input type="checkbox"> 📍 GPS rastreamento</label>
+          <label class="dm-checkitem"><input type="checkbox"> 📷 Câmera interna</label>
+          <label class="dm-checkitem"><input type="checkbox"> 🔒 Cinto 3 pontos</label>
+          <label class="dm-checkitem"><input type="checkbox"> 🪑 Cadeirinhas</label>
+          <label class="dm-checkitem"><input type="checkbox"> 🔥 Extintor de incêndio</label>
+          <label class="dm-checkitem"><input type="checkbox"> 🚪 Porta deslizante</label>
+          <label class="dm-checkitem"><input type="checkbox"> 📱 App de rastreio para pais</label>
+        </div>
+
+        <div class="dm-section-title" style="margin-top:22px;">Preços</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Mensalidade — Somente ida (R$)</label>
+            <input type="number" class="dm-input" placeholder="Ex: 180">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Mensalidade — Ida e volta (R$)</label>
+            <input type="number" class="dm-input" placeholder="Ex: 280">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Valor por viagem avulsa (R$)</label>
+            <input type="number" class="dm-input" placeholder="Ex: 25">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Ponto de referência de embarque</label>
+            <input type="text" class="dm-input" placeholder="Ex: Portão da escola / casa do aluno">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: ROTAS -->
+      <div class="dm-step-content" id="dm-step-3" style="display:none;">
+        <div class="dm-section-title">Área de atuação</div>
+        <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;">Selecione os estados, cidades e bairros onde você atende. Você pode escolher mais de um.</p>
+
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Estado de atuação *</label>
+            <select class="dm-input" id="rt-estado" onchange="onRtEstadoChange()">
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Cidade *</label>
+            <select class="dm-input" id="rt-cidade" onchange="onRtCidadeChange()" disabled>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="dm-field" style="margin-bottom:14px;">
+          <label class="dm-label">Bairros atendidos *</label>
+          <select class="dm-input" id="rt-bairro" disabled onchange="addBairroRota()">
+            <option value="">Selecione um bairro para adicionar</option>
+          </select>
+        </div>
+
+        <div id="rt-bairros-list" class="dm-tags-selected" style="margin-bottom:18px;"></div>
+
+        <div class="dm-field">
+          <label class="dm-label">Escolas atendidas</label>
+          <select class="dm-input" id="rt-escola" disabled onchange="addEscolaRota()">
+            <option value="">Selecione uma escola para adicionar</option>
+          </select>
+        </div>
+
+        <div id="rt-escolas-list" class="dm-tags-selected" style="margin-bottom:18px;"></div>
+
+        <div class="dm-section-title" style="margin-top:10px;">Horários de operação</div>
+        <div class="dm-grid-2">
+          <div class="dm-field">
+            <label class="dm-label">Turno da manhã — Saída</label>
+            <input type="time" class="dm-input" value="06:30">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Turno da manhã — Retorno</label>
+            <input type="time" class="dm-input" value="12:30">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Turno da tarde — Saída</label>
+            <input type="time" class="dm-input" value="12:00">
+          </div>
+          <div class="dm-field">
+            <label class="dm-label">Turno da tarde — Retorno</label>
+            <input type="time" class="dm-input" value="18:00">
+          </div>
+        </div>
+
+        <div class="dm-section-title" style="margin-top:16px;">Dias de operação</div>
+        <div class="dm-checkgrid">
+          <label class="dm-checkitem"><input type="checkbox" checked> Segunda-feira</label>
+          <label class="dm-checkitem"><input type="checkbox" checked> Terça-feira</label>
+          <label class="dm-checkitem"><input type="checkbox" checked> Quarta-feira</label>
+          <label class="dm-checkitem"><input type="checkbox" checked> Quinta-feira</label>
+          <label class="dm-checkitem"><input type="checkbox" checked> Sexta-feira</label>
+          <label class="dm-checkitem"><input type="checkbox"> Sábado</label>
+        </div>
+
+        <div class="dm-field" style="margin-top:16px;">
+          <label class="dm-label">Descrição do serviço (aparece no seu perfil)</label>
+          <textarea class="dm-input" rows="3" placeholder="Fale um pouco sobre você e seu serviço. Ex: 8 anos de experiência, pontual, veículo climatizado..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 4: DOCUMENTOS -->
+      <div class="dm-step-content" id="dm-step-4" style="display:none;">
+        <div class="dm-section-title">Documentos obrigatórios</div>
+        <p style="font-size:13px;color:var(--text-mid);margin-bottom:20px;">Todos os documentos são analisados pela equipe Rota Kids. Formatos aceitos: PDF, JPG ou PNG (máx. 10MB cada).</p>
+
+        <div class="dm-doc-list">
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">🪪</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">CNH Categoria D ou E *</div>
+              <div class="dm-doc-desc">Frente e verso. Deve estar dentro do prazo de validade.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileUploaded(this,'cnh-status')"></label>
+            <span class="dm-doc-status" id="cnh-status"></span>
+          </div>
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">🚐</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">CRLV — Licenciamento do veículo *</div>
+              <div class="dm-doc-desc">Documento do ano vigente com dados do veículo.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileUploaded(this,'crlv-status')"></label>
+            <span class="dm-doc-status" id="crlv-status"></span>
+          </div>
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">🔍</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">Certidão de antecedentes criminais *</div>
+              <div class="dm-doc-desc">Federal e estadual. Emitida nos últimos 90 dias.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileUploaded(this,'crim-status')"></label>
+            <span class="dm-doc-status" id="crim-status"></span>
+          </div>
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">🛡️</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">Apólice de seguro escolar *</div>
+              <div class="dm-doc-desc">Seguro com cobertura para transporte de menores.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileUploaded(this,'seg-status')"></label>
+            <span class="dm-doc-status" id="seg-status"></span>
+          </div>
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">🔧</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">Laudo de vistoria veicular</div>
+              <div class="dm-doc-desc">Vistoria de segurança do veículo. Recomendado.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileUploaded(this,'vist-status')"></label>
+            <span class="dm-doc-status" id="vist-status"></span>
+          </div>
+          <div class="dm-doc-item">
+            <div class="dm-doc-icon">📸</div>
+            <div class="dm-doc-info">
+              <div class="dm-doc-name">Foto do veículo</div>
+              <div class="dm-doc-desc">Frente, lateral e interior. Mínimo 3 fotos.</div>
+            </div>
+            <label class="dm-upload-btn">Enviar <input type="file" accept=".jpg,.jpeg,.png" multiple style="display:none" onchange="fileUploaded(this,'foto-status')"></label>
+            <span class="dm-doc-status" id="foto-status"></span>
+          </div>
+        </div>
+
+        <div class="dm-terms">
+          <label class="dm-checkitem" style="font-size:13px;gap:10px;">
+            <input type="checkbox" id="termsCheck">
+            Declaro que todas as informações fornecidas são verdadeiras e autorizo a Rota Kids a verificar meus documentos e dados pessoais, conforme a <span style="color:var(--orange);cursor:pointer;">Política de Privacidade</span>.
+          </label>
+        </div>
+
+        <!-- SUCCESS STATE -->
+        <div id="dm-success" style="display:none;text-align:center;padding:32px;">
+          <div style="font-size:60px;margin-bottom:12px;">🎉</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;color:var(--navy);margin-bottom:8px;">Cadastro enviado!</div>
+          <div style="font-size:14px;color:var(--text-mid);max-width:360px;margin:0 auto;">Analisaremos seus documentos em até <strong>48 horas</strong>. Você receberá um e-mail de confirmação e, após a aprovação, seu perfil ficará visível para as famílias.</div>
+          <button onclick="closeDriverModal()" class="sm-apply-btn" style="max-width:220px;margin:24px auto 0;">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER NAVIGATION -->
+    <div class="dm-footer" id="dm-footer">
+      <div style="font-size:12px;color:var(--text-light);">Passo <span id="cur-step">1</span> de 4</div>
+      <div style="display:flex;gap:10px;">
+        <button class="dm-btn-prev" id="dm-prev" onclick="dmPrev()" style="display:none;">← Voltar</button>
+        <button class="dm-btn-next" id="dm-next" onclick="dmNext()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* DRIVER MODAL STYLES */
+  .driver-modal {
+    width: 100%; max-width: 860px;
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+    animation: slideUpModal 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex; flex-direction: column;
+    max-height: calc(100vh - 100px);
+  }
+
+  .dm-header {
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    padding: 22px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .dm-title { font-family:'Nunito',sans-serif; font-weight:900; font-size:20px; color:white; }
+  .dm-sub { font-size:12px; color:rgba(255,255,255,0.6); margin-top:2px; }
+
+  .dm-steps {
+    display: flex; align-items: center;
+    padding: 16px 28px; background: var(--gray-light);
+    border-bottom: 1px solid var(--gray-mid);
+    flex-shrink: 0;
+  }
+
+  .dm-step {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: default;
+  }
+
+  .dm-step span {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--gray-mid); color: var(--text-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; transition: all 0.3s;
+  }
+
+  .dm-step small { font-size: 10px; color: var(--text-light); font-weight: 600; }
+
+  .dm-step.active span { background: linear-gradient(135deg,#FF613C,#FFC629); color: white; }
+  .dm-step.active small { color: var(--orange); }
+  .dm-step.done span { background: #2E7D32; color: white; }
+  .dm-step.done small { color: #2E7D32; }
+
+  .dm-step-line { flex: 1; height: 2px; background: var(--gray-mid); margin: 0 6px 14px; }
+
+  .dm-body { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+  .dm-section-title {
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:16px;
+    color: var(--navy); margin-bottom:14px;
+    padding-bottom: 8px; border-bottom: 2px solid var(--gray-mid);
+  }
+
+  .dm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .dm-field { display: flex; flex-direction: column; gap: 5px; }
+
+  .dm-label { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+
+  .dm-input {
+    width: 100%; border: 1.5px solid var(--gray-mid);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 14px; color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+    outline: none; transition: border-color 0.2s;
+    background: white;
+  }
+  .dm-input:focus { border-color: var(--orange); }
+  .dm-input:disabled { background: var(--gray-light); color: var(--text-light); }
+
+  .dm-checkgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .dm-checkitem {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-dark); cursor: pointer;
+    padding: 8px 10px; border-radius: 8px; transition: background 0.15s;
+  }
+  .dm-checkitem:hover { background: var(--gray-light); }
+  .dm-checkitem input { accent-color: var(--orange); width:15px; height:15px; }
+
+  .dm-doc-list { display: flex; flex-direction: column; gap: 10px; margin-bottom:20px; }
+
+  .dm-doc-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 12px;
+    border: 1.5px solid var(--gray-mid); background: white;
+    transition: border-color 0.2s;
+  }
+  .dm-doc-item:hover { border-color: rgba(255,97,60,0.3); }
+
+  .dm-doc-icon { font-size: 24px; flex-shrink: 0; }
+
+  .dm-doc-info { flex: 1; }
+  .dm-doc-name { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+  .dm-doc-desc { font-size: 12px; color: var(--text-light); }
+
+  .dm-upload-btn {
+    padding: 8px 16px; border-radius: 8px;
+    background: var(--gray-light); border: 1.5px solid var(--gray-mid);
+    font-size: 12px; font-weight: 700; color: var(--text-mid);
+    cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .dm-upload-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+  .dm-doc-status { font-size: 11px; font-weight: 700; flex-shrink: 0; min-width: 60px; text-align:right; }
+
+  .dm-terms { margin-top: 16px; padding:14px; background:var(--gray-light); border-radius:12px; }
+
+  .dm-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px;
+    border-top: 1px solid var(--gray-mid);
+    background: white; flex-shrink: 0;
+  }
+
+  .dm-btn-prev {
+    padding: 10px 22px; border-radius: 50px;
+    border: 1.5px solid var(--gray-mid); background: white;
+    font-size: 14px; font-weight: 600; color: var(--text-mid);
+    cursor: pointer; font-family: 'Poppins', sans-serif;
+    transition: all 0.15s;
+  }
+  .dm-btn-prev:hover { border-color: var(--navy); color: var(--navy); }
+
+  .dm-btn-next {
+    padding: 10px 28px; border-radius: 50px;
+    background: linear-gradient(135deg, #FF613C, #FFC629);
+    color: white; border: none;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: 'Poppins', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .dm-btn-next:hover { opacity: 0.9; }
+
+  .rk-select {
+    width: 100%; border: 1.5px solid var(--gray-mid);
+    border-radius: 10px; padding: 9px 12px;
+    font-size: 13px; color: var(--text-dark);
+    font-family: 'Poppins', sans-serif;
+    background: white; outline: none; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .rk-select:focus { border-color: var(--orange); }
+  .rk-select:disabled { background: var(--gray-light); color: var(--text-light); cursor: default; }
+
+  .dm-tags-selected { display:flex; flex-wrap:wrap; gap:6px; min-height:10px; }
+
+  .dm-selected-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 50px;
+    background: linear-gradient(135deg,rgba(255,97,60,0.1),rgba(255,198,41,0.1));
+    border: 1px solid rgba(255,97,60,0.25);
+    font-size: 12px; font-weight: 600; color: var(--orange);
+  }
+
+  .dm-selected-tag button {
+    background: none; border: none; color: var(--orange);
+    font-size: 14px; cursor: pointer; padding: 0; line-height: 1;
+  }
+</style>
+
+<script>
+// ================================================================
+// DADOS DO BRASIL — estados, cidades representativas, bairros, escolas
+// ================================================================
+const BR = {
+  "AC": { nome:"Acre", cidades:{
+    "Rio Branco": { bairros:["Centro","Bosque","Quinze","Cadeia Velha","Capoeira"], escolas:{"Centro":["E.E. Barão do Rio Branco","C.E. Colégio Acreano"],"Bosque":["E.M. Árvore do Saber"],"Quinze":["C.E. Thaumaturgo de Azevedo"],"Capoeira":["E.M. Nossa Senhora de Fátima"]} },
+    "Cruzeiro do Sul": { bairros:["Centro","Miritizal","Remanso"], escolas:{"Centro":["E.E. Apolônio Sales"],"Miritizal":["E.M. Dom Henrique"],"Remanso":["E.M. Santa Cruz"]} }
+  }},
+  "AL": { nome:"Alagoas", cidades:{
+    "Maceió": { bairros:["Centro","Farol","Ponta Verde","Mangabeiras","Jatiúca","Benedito Bentes"], escolas:{"Centro":["C.E. Secundarista de Maceió","E.E. Deodoro"],"Farol":["Colégio Salesiano","E.M. Frei Orlando"],"Ponta Verde":["C.E. Virgem dos Pobres"],"Jatiúca":["Colégio do SESI","E.M. Jatiúca"]} },
+    "Arapiraca": { bairros:["Centro","Baixão","Planalto","Eldorado"], escolas:{"Centro":["E.E. Otávio Correa"],"Baixão":["E.M. Santo Antônio"],"Planalto":["C.E. Arapiraquense"]} }
+  }},
+  "AM": { nome:"Amazonas", cidades:{
+    "Manaus": { bairros:["Centro","Adrianópolis","Chapada","Aleixo","Flores","Cidade Nova","Jorge Teixeira"], escolas:{"Centro":["E.E. Sóter de Oliveira","E.E. Ajuricaba"],"Adrianópolis":["Colégio Salesiano Dom Bosco","E.E. Maria Auxiliadora"],"Chapada":["E.E. Estadual Dom Bosco"],"Flores":["E.M. Flores","E.M. Moacyr Alves"],"Cidade Nova":["E.M. Cidade Nova","E.M. Dom Pedro I"]} },
+    "Parintins": { bairros:["Centro","Francesa","Itaboraí do Meio"], escolas:{"Centro":["E.E. Colégio Estadual Parintins"],"Francesa":["E.M. N.S. do Perpétuo Socorro"]} }
+  }},
+  "AP": { nome:"Amapá", cidades:{
+    "Macapá": { bairros:["Centro","Zerão","Buritizal","Novo Horizonte","Santa Inês"], escolas:{"Centro":["E.E. Amapaense","E.E. Boa Esperança"],"Zerão":["E.E. São Sebastião"],"Buritizal":["C.E. Amapá"]} },
+    "Santana": { bairros:["Centro","Elesbão","Igarapé do Lago"], escolas:{"Centro":["E.E. São Lázaro"],"Elesbão":["E.M. Elesbão"]} }
+  }},
+  "BA": { nome:"Bahia", cidades:{
+    "Salvador": { bairros:["Centro","Barra","Pituba","Ondina","Rio Vermelho","Federação","Brotas","Itapuã","Liberdade","Cajazeiras"], escolas:{"Centro":["C.E. Severino Vieira","E.E. da Bahia"],"Barra":["Colégio Estadual Gustavo Henrique"],"Pituba":["C.E. Murilo Braga","E.M. Pituba"],"Rio Vermelho":["C.E. Odorico Tavares"],"Brotas":["E.M. Brotas"],"Cajazeiras":["E.M. Cajazeiras I","E.M. Cajazeiras V"]} },
+    "Feira de Santana": { bairros:["Centro","Brasília","George Américo","Sobradinho","Tomba"], escolas:{"Centro":["C.E. Estadual de Feira"],"Brasília":["E.M. Brasília"],"Sobradinho":["E.M. Sobradinho"]} },
+    "Vitória da Conquista": { bairros:["Centro","Brasil","Recreio","Espírito Santo","Jurema"], escolas:{"Centro":["C.E. Estadual de Conquista"],"Brasil":["E.M. José Fernandes"]} }
+  }},
+  "CE": { nome:"Ceará", cidades:{
+    "Fortaleza": { bairros:["Centro","Meireles","Aldeota","Fátima","Messejana","Barra do Ceará","Mondubim","Parangaba","Benfica","Damas"], escolas:{"Centro":["E.E. Liceu do Ceará","C.E.E.P. Instituto Centro"],"Meireles":["Colégio Farias Brito","E.E. João Pessoa"],"Aldeota":["C.E. Aldeota","E.M. Aldeota"],"Fátima":["C.E. Dom Luís"],"Messejana":["E.E. Joaquim Nogueira"],"Mondubim":["E.M. Mondubim","E.M. Nossa Senhora de Lourdes"],"Parangaba":["C.E. Justiniano de Serpa"]} },
+    "Juazeiro do Norte": { bairros:["Centro","Pirajá","João Cabral","Franciscanos","Lagoa Seca","Limoeiro","Salesianos","Santa Teresa"], escolas:{"Centro":["E.E. Padre Cícero","E.M. João XXIII"],"Pirajá":["E.M. Pirajá","E.E. Governador Adauto"],"João Cabral":["E.M. João Cabral","E.M. Joaquim Batista"],"Franciscanos":["C.E. Dom Expedito","E.M. Santa Maria"],"Salesianos":["C.E. Dom Bosco","E.M. Salesianos"],"Santa Teresa":["E.M. Santa Teresa","E.M. Frei Damião"]} },
+    "Crato": { bairros:["Centro","Seminário","Pimenta","Lameiro","Muriti"], escolas:{"Centro":["C.E. Estadual do Crato","E.M. São Vicente"],"Seminário":["E.E. Seminário Maior"],"Pimenta":["E.M. Pimenta"]} },
+    "Sobral": { bairros:["Centro","Cohab","Terrenos Novos","Sumaré","Alto da Brasília"], escolas:{"Centro":["C.E.E.P. Dom José"],"Cohab":["E.M. Cohab","E.M. Dom Expedito"],"Sumaré":["E.M. Sumaré"]} }
+  }},
+  "DF": { nome:"Distrito Federal", cidades:{
+    "Brasília": { bairros:["Asa Norte","Asa Sul","Lago Norte","Lago Sul","Guará","Taguatinga","Ceilândia","Samambaia","Planaltina"], escolas:{"Asa Norte":["C.E.F. 410 Norte","E.E. Elefante Branco"],"Asa Sul":["C.E.F. 304 Sul","Colégio Leo Tolstoi"],"Taguatinga":["C.E.F. 02 Taguatinga","C.E.F. 08 Taguatinga"],"Ceilândia":["C.E.F. 02 Ceilândia","C.E.F. 11 Ceilândia"],"Samambaia":["C.E.F. 427 Samambaia"]} }
+  }},
+  "ES": { nome:"Espírito Santo", cidades:{
+    "Vitória": { bairros:["Centro","Jardim da Penha","Praia do Canto","Bento Ferreira","Maruípe","Jardim Camburi"], escolas:{"Centro":["E.E. Alberto de Oliveira","E.E. do Espírito Santo"],"Jardim da Penha":["E.E. Juscelino Kubitschek"],"Praia do Canto":["E.E. Dom Bosco","Colégio Americano"]} },
+    "Serra": { bairros:["Serra Sede","Carapina","Laranjeiras","Jardim Carapina"], escolas:{"Serra Sede":["E.E. Paulo VI"],"Laranjeiras":["E.E. Laranjeiras"]} }
+  }},
+  "GO": { nome:"Goiás", cidades:{
+    "Goiânia": { bairros:["Centro","Setor Bueno","Jardim Goiás","Setor Oeste","Jardim América","Setor Sul","Bairro Feliz"], escolas:{"Centro":["C.E. Estadual de Goiânia","E.E. Dom Abel"],"Setor Bueno":["Colégio Estadual Setor Bueno","E.M. Setor Bueno"],"Jardim Goiás":["E.M. Jardim Goiás"],"Setor Oeste":["C.E. Hugo de Carvalho"]} },
+    "Aparecida de Goiânia": { bairros:["Centro","Garavelo","Papillon","Independência"], escolas:{"Centro":["C.E. Antônia dos Santos Abreu"],"Garavelo":["E.M. Garavelo"]} }
+  }},
+  "MA": { nome:"Maranhão", cidades:{
+    "São Luís": { bairros:["Centro","Cohab","Cohab Anil","Vinhais","São Francisco","Renascença","Areinha"], escolas:{"Centro":["C.E. Centro","E.E. Dr. Gastão Vidigal"],"Cohab":["C.E. Cohab Anil I","E.M. Cohab"],"Vinhais":["C.E. Vinhais","E.M. Vinhais"],"São Francisco":["E.M. São Francisco","C.E. São Francisco"]} },
+    "Imperatriz": { bairros:["Centro","Parque Anhanguera","Três Poderes","Avião"], escolas:{"Centro":["C.E. Imperatriz","E.E. João Coelho"],"Parque Anhanguera":["E.M. Parque Anhanguera"]} }
+  }},
+  "MG": { nome:"Minas Gerais", cidades:{
+    "Belo Horizonte": { bairros:["Centro","Savassi","Buritis","Pampulha","Venda Nova","Contagem","Santa Efigênia","Floresta","Barreiro"], escolas:{"Centro":["E.E. Estadual Central","C.E. Helena Antipoff"],"Savassi":["Colégio Santa Maria","E.E. Savassi"],"Buritis":["E.M. Buritis","E.E. Buritis"],"Pampulha":["E.E. Pampulha","E.M. Pampulha"],"Venda Nova":["E.M. Venda Nova","C.E. Venda Nova"],"Barreiro":["E.M. Barreiro","C.E. Barreiro"]} },
+    "Uberlândia": { bairros:["Centro","Santa Mônica","Tibery","Marta Helena","Jardim Karaíba"], escolas:{"Centro":["C.E.E. Uberlândia"],"Santa Mônica":["E.M. Santa Mônica"],"Tibery":["E.E. Tibery"]} },
+    "Contagem": { bairros:["Centro","Nacional","Eldorado","Industrial"], escolas:{"Centro":["E.E. Contagem"],"Nacional":["E.M. Nacional"]} }
+  }},
+  "MS": { nome:"Mato Grosso do Sul", cidades:{
+    "Campo Grande": { bairros:["Centro","Autonomista","Monte Castelo","Coophavilla","Santa Fé"], escolas:{"Centro":["E.E. Joaquim Murtinho","E.E. Maria Constança"],"Autonomista":["E.M. Autonomista"],"Monte Castelo":["E.M. Monte Castelo"]} },
+    "Dourados": { bairros:["Centro","Jardim Tropical","Vila Planalto"], escolas:{"Centro":["E.E. Presidente Vargas"],"Jardim Tropical":["E.M. Jardim Tropical"]} }
+  }},
+  "MT": { nome:"Mato Grosso", cidades:{
+    "Cuiabá": { bairros:["Centro","CPA","Araés","Duque de Caxias","Jardim Itália"], escolas:{"Centro":["E.E. Cel. Escolástico"],"CPA":["E.M. CPA I","E.M. CPA II"],"Araés":["E.E. Araés"]} },
+    "Várzea Grande": { bairros:["Centro","Chapéu do Sol","Mapim"], escolas:{"Centro":["E.E. Várzea Grande"],"Chapéu do Sol":["E.M. Chapéu do Sol"]} }
+  }},
+  "PA": { nome:"Pará", cidades:{
+    "Belém": { bairros:["Centro","Umarizal","Nazaré","Marco","Guamá","Pedreira","Sacramenta"], escolas:{"Centro":["E.E. Paes de Carvalho","C.E. Dr. Celso Malcher"],"Umarizal":["Colégio Anglo do Pará","E.E. Umarizal"],"Nazaré":["E.E. Nazaré","Colégio Gentil"],"Guamá":["E.M. Guamá","E.E. Guamá"],"Marco":["E.E. Marco","E.M. Marco"]} },
+    "Ananindeua": { bairros:["Centro","Curuçambá","Coqueiro"], escolas:{"Centro":["E.E. Ananindeua"],"Curuçambá":["E.M. Curuçambá"]} }
+  }},
+  "PB": { nome:"Paraíba", cidades:{
+    "João Pessoa": { bairros:["Centro","Manaíra","Tambaú","Torre","Bessa","Castelo Branco","Mangabeira"], escolas:{"Centro":["E.E. Epitácio Pessoa","C.E. Estadual"],"Manaíra":["Colégio Bom Jesus","E.E. Manaíra"],"Tambaú":["C.E. Tambaú"],"Mangabeira":["E.E. Mangabeira","E.M. Mangabeira"]} },
+    "Campina Grande": { bairros:["Centro","Miriam","Bodocongó","Pedregal","Malvinas"], escolas:{"Centro":["E.E. Estadual Campina Grande","C.E. Epitácio Pessoa"],"Bodocongó":["E.M. Bodocongó"],"Malvinas":["E.M. Malvinas"]} }
+  }},
+  "PE": { nome:"Pernambuco", cidades:{
+    "Recife": { bairros:["Centro","Boa Viagem","Aflitos","Casa Forte","Olinda","Boa Vista","Espinheiro","Graças"], escolas:{"Centro":["E.E. Ginásio Pernambucano","C.E.E. Recife"],"Boa Viagem":["Colégio Nóbrega","E.E. Boa Viagem"],"Aflitos":["C.E. Aflitos","E.E. Aflitos"],"Casa Forte":["E.M. Casa Forte","E.E. Casa Forte"]} },
+    "Caruaru": { bairros:["Centro","Maurício de Nassau","Rendeiras","São Francisco"], escolas:{"Centro":["E.E. Estadual Caruaru"],"Maurício de Nassau":["E.M. Maurício de Nassau"]} }
+  }},
+  "PI": { nome:"Piauí", cidades:{
+    "Teresina": { bairros:["Centro","Jóquei","Morada do Sol","São João","Ilhotas","Santa Maria da Codipi"], escolas:{"Centro":["C.E.E. Antonino Freire","E.E. Liceu Piauiense"],"Jóquei":["C.E. Jóquei","E.M. Jóquei"],"Morada do Sol":["E.M. Morada do Sol"],"São João":["E.E. São João"]} },
+    "Parnaíba": { bairros:["Centro","Ilha Grande","Dirceu Arcoverde"], escolas:{"Centro":["E.E. Estadual Parnaíba"],"Ilha Grande":["E.M. Ilha Grande"]} }
+  }},
+  "PR": { nome:"Paraná", cidades:{
+    "Curitiba": { bairros:["Centro","Batel","Água Verde","Portão","Xaxim","CIC","Boa Vista","Santa Felicidade","Bacacheri"], escolas:{"Centro":["C.E. do Paraná","E.E. Papa João XXIII"],"Batel":["Colégio Novo Mundo","E.E. Batel"],"Água Verde":["C.E. Água Verde","E.E. Tancredo Neves"],"CIC":["E.M. CIC","C.E. Evaristo da Veiga"],"Boa Vista":["E.M. Boa Vista","E.E. Boa Vista"]} },
+    "Londrina": { bairros:["Centro","Gleba Palhano","Jardim Piza","Heimtal"], escolas:{"Centro":["C.E. Melo","E.E. Estadual Londrina"],"Gleba Palhano":["E.M. Palhano"]} },
+    "Maringá": { bairros:["Centro","Zona 07","Novo Centro","Jardim Alvorada"], escolas:{"Centro":["C.E. Estadual Maringá"],"Zona 07":["E.M. Zona 07"]} }
+  }},
+  "RJ": { nome:"Rio de Janeiro", cidades:{
+    "Rio de Janeiro": { bairros:["Centro","Copacabana","Ipanema","Botafogo","Tijuca","Barra da Tijuca","Méier","Campo Grande","Realengo","Penha"], escolas:{"Centro":["C.E. Pedro II","C.E. Júlia Kubitschek"],"Copacabana":["Colégio Estadual Copacabana","E.E. Copacabana"],"Ipanema":["C.E. Ipanema","E.M. Ipanema"],"Tijuca":["C.E. Tijuca","E.M. Tijuca"],"Barra da Tijuca":["C.E. Barra","Escola Municipal Barra"],"Méier":["C.E. Méier","E.M. Méier"],"Campo Grande":["E.M. Campo Grande","C.E. Campo Grande"]} },
+    "Niterói": { bairros:["Centro","Icaraí","São Francisco","Fonseca","Pendotiba"], escolas:{"Centro":["C.E. Niterói","E.E. Niterói"],"Icaraí":["Colégio Salesiano Santa Rosa","E.E. Icaraí"]} },
+    "Nova Iguaçu": { bairros:["Centro","Austin","Comendador Soares","Caonze"], escolas:{"Centro":["C.E. Nova Iguaçu"],"Austin":["E.M. Austin"]} }
+  }},
+  "RN": { nome:"Rio Grande do Norte", cidades:{
+    "Natal": { bairros:["Centro","Petrópolis","Tirol","Lagoa Nova","Candelária","Ponta Negra","Alecrim"], escolas:{"Centro":["E.E. Estadual Natal","C.E. José Augusto"],"Petrópolis":["C.E. Petrópolis","E.E. Petrópolis"],"Tirol":["C.E. Tirol","Colégio Estadual do Tirol"],"Ponta Negra":["E.M. Ponta Negra","E.E. Ponta Negra"]} },
+    "Mossoró": { bairros:["Centro","Bom Jardim","Abolição","Boa Vista"], escolas:{"Centro":["E.E. Mossoró","C.E. Estadual Mossoró"],"Bom Jardim":["E.M. Bom Jardim"]} }
+  }},
+  "RO": { nome:"Rondônia", cidades:{
+    "Porto Velho": { bairros:["Centro","Lagoa","Cascalheira","Agenor de Carvalho"], escolas:{"Centro":["E.E. Carmela Dutra","E.E. Rui Barbosa"],"Lagoa":["E.M. Lagoa"]} },
+    "Ji-Paraná": { bairros:["Centro","Urupá","Boa Esperança"], escolas:{"Centro":["E.E. Ji-Paraná"],"Urupá":["E.M. Urupá"]} }
+  }},
+  "RR": { nome:"Roraima", cidades:{
+    "Boa Vista": { bairros:["Centro","Caranã","Paraviana","São Bento"], escolas:{"Centro":["E.E. Lobo d'Almada","C.E. Roraima"],"Caranã":["E.M. Caranã"],"Paraviana":["E.E. Paraviana"]} }
+  }},
+  "RS": { nome:"Rio Grande do Sul", cidades:{
+    "Porto Alegre": { bairros:["Centro","Moinhos de Vento","Bom Fim","Boa Vista","Zona Norte","Rubem Berta","Lomba do Pinheiro","Restinga"], escolas:{"Centro":["E.E. Júlio de Castilhos","E.E. Pio XII"],"Moinhos de Vento":["Colégio Mauá","E.E. Moinhos"],"Bom Fim":["E.E. Bom Fim","E.M. Bom Fim"],"Rubem Berta":["E.M. Rubem Berta","C.E. Rubem Berta"],"Restinga":["E.M. Restinga","E.E. Restinga"]} },
+    "Caxias do Sul": { bairros:["Centro","Santa Catarina","Desvio Rizzo","São Pelegrino"], escolas:{"Centro":["C.E. Caxias do Sul","E.E. Rui Barbosa"],"Santa Catarina":["E.M. Santa Catarina"]} },
+    "Pelotas": { bairros:["Centro","Fragata","Três Vendas","Laranjal"], escolas:{"Centro":["C.E. Pelotas","E.E. Simões Lopes"],"Fragata":["E.E. Fragata"]} }
+  }},
+  "SC": { nome:"Santa Catarina", cidades:{
+    "Florianópolis": { bairros:["Centro","Trindade","Córrego Grande","Lagoa da Conceição","Campeche","Ingleses","Costeira"], escolas:{"Centro":["E.E. Lauro Müller","E.E. Feliciano Nunes"],"Trindade":["E.M. Trindade","E.E. Trindade"],"Lagoa da Conceição":["E.E. Lagoa","E.M. Lagoa"],"Campeche":["E.M. Campeche","E.E. Campeche"]} },
+    "Joinville": { bairros:["Centro","Bucarein","Glória","Saguaçu","Nova Brasília"], escolas:{"Centro":["E.E. Joinville","C.E. Estadual Joinville"],"Bucarein":["E.M. Bucarein"],"Saguaçu":["E.E. Saguaçu"]} },
+    "Blumenau": { bairros:["Centro","Garcia","Velha","Badenfurt","Itoupava Norte"], escolas:{"Centro":["C.E. Blumenau","E.E. Fritz Müller"],"Garcia":["E.E. Garcia"]} }
+  }},
+  "SE": { nome:"Sergipe", cidades:{
+    "Aracaju": { bairros:["Centro","Atalaia","Coroa do Meio","Suíssa","Jabotiana","Farolândia"], escolas:{"Centro":["C.E. Estadual Aracaju","E.E. Atheneu"],"Atalaia":["E.E. Atalaia","E.M. Atalaia"],"Coroa do Meio":["E.M. Coroa do Meio"],"Jabotiana":["E.E. Jabotiana","E.M. Jabotiana"]} }
+  }},
+  "SP": { nome:"São Paulo", cidades:{
+    "São Paulo": { bairros:["Centro","Pinheiros","Moema","Vila Olímpia","Santana","Lapa","Ipiranga","Tatuapé","Santo André","Itaquera","Campo Limpo"], escolas:{"Centro":["E.E. Caetano de Campos","E.E. República"],"Pinheiros":["Colégio Oswaldo Cruz","E.E. Pinheiros"],"Moema":["C.E. Moema","E.M. Moema"],"Santana":["E.M. Santana","E.E. Santana"],"Tatuapé":["C.E. Tatuapé","E.M. Tatuapé"],"Itaquera":["E.M. Itaquera","C.E. Itaquera"],"Campo Limpo":["E.M. Campo Limpo","E.E. Campo Limpo"]} },
+    "Campinas": { bairros:["Centro","Cambuí","Barão Geraldo","Taquaral","Jardim Chapadão"], escolas:{"Centro":["E.E. Culto à Ciência","E.E. Carlos Gomes"],"Cambuí":["Colégio São Paulo","E.E. Cambuí"],"Barão Geraldo":["E.E. Barão Geraldo","E.M. Barão Geraldo"]} },
+    "Guarulhos": { bairros:["Centro","Jardim Tranquilidade","Ponte Grande","Cumbica"], escolas:{"Centro":["E.E. Guarulhos","C.E. Guarulhos"],"Ponte Grande":["E.M. Ponte Grande"]} },
+    "Santo André": { bairros:["Centro","Vila Bastos","Jardim Las Vegas","Paraíso"], escolas:{"Centro":["E.E. Santo André","C.E. Estadual Santo André"],"Vila Bastos":["E.M. Vila Bastos"]} }
+  }},
+  "TO": { nome:"Tocantins", cidades:{
+    "Palmas": { bairros:["Plano Diretor Norte","Plano Diretor Sul","Aureny I","Taquaralto","Jardim Aureny"], escolas:{"Plano Diretor Norte":["C.E. CEM Norte","E.M. Norte"],"Plano Diretor Sul":["C.E. CEM Sul","E.E. Sul"],"Aureny I":["E.M. Aureny I"],"Taquaralto":["E.M. Taquaralto"]} },
+    "Araguaína": { bairros:["Centro","Setor Universitário","Araguanã"], escolas:{"Centro":["C.E. Araguaína","E.E. Dom Orione"],"Setor Universitário":["E.M. Setor Universitário"]} }
+  }}
+};
+
+// Motoristas fictícios para demonstração
+const DRIVERS = [
+  { id:1, nome:"Carlos Rocha", exp:"8 anos", av:4.9, rev:128, escolas:["E.M. João XXIII","C.E. Dom Bosco"], cap:12, vagas:4, preco:280, turno:"Manhã e Tarde", van:"🚐", badge:"pro" },
+  { id:2, nome:"Maria Santos", exp:"5 anos", av:4.8, rev:84, escolas:["E.M. João XXIII","E.M. Santa Maria"], cap:10, vagas:2, preco:250, turno:"Manhã", van:"🚌", badge:"top" },
+  { id:3, nome:"João Oliveira", exp:"12 anos", av:4.7, rev:203, escolas:["C.E. Dom Expedito","E.M. Santa Maria"], cap:15, vagas:0, preco:310, turno:"Integral", van:"🚐", badge:"" },
+  { id:4, nome:"Ana Lima", exp:"3 anos", av:4.9, rev:31, escolas:["E.M. João XXIII"], cap:8, vagas:3, preco:220, turno:"Tarde", van:"🚐", badge:"pro" },
+  { id:5, nome:"Pedro Souza", exp:"7 anos", av:4.6, rev:97, escolas:["C.E. Dom Bosco","E.M. Frei Damião"], cap:12, vagas:5, preco:260, turno:"Manhã e Tarde", van:"🚌", badge:"" },
+];
+
+// ================================================================
+// PREENCHER SELECTS DE ESTADOS
+// ================================================================
+function fillEstados(selectId) {
+  const sel = document.getElementById(selectId);
+  const estadosSorted = Object.keys(BR).sort((a,b) => BR[a].nome.localeCompare(BR[b].nome));
+  estadosSorted.forEach(uf => {
+    const opt = document.createElement('option');
+    opt.value = uf;
+    opt.textContent = BR[uf].nome + ' (' + uf + ')';
+    sel.appendChild(opt);
+  });
+}
+
+function fillCidades(estadoUF, selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecione a cidade</option>';
+  if (!estadoUF || !BR[estadoUF]) { sel.disabled=true; return; }
+  Object.keys(BR[estadoUF].cidades).sort().forEach(cidade => {
+    const opt = document.createElement('option');
+    opt.value = cidade; opt.textContent = cidade;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
+}
+
+function fillBairros(estadoUF, cidade, selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecione o bairro</option>';
+  if (!estadoUF || !cidade || !BR[estadoUF]?.cidades[cidade]) { sel.disabled=true; return; }
+  BR[estadoUF].cidades[cidade].bairros.sort().forEach(b => {
+    const opt = document.createElement('option'); opt.value=b; opt.textContent=b;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
+}
+
+function fillEscolas(estadoUF, cidade, bairro, selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecione a escola</option>';
+  const escolas = BR[estadoUF]?.cidades[cidade]?.escolas[bairro] || [];
+  if (!escolas.length) { sel.disabled=true; return; }
+  escolas.sort().forEach(e => {
+    const opt = document.createElement('option'); opt.value=e; opt.textContent=e;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
+}
+
+// ================================================================
+// FILTRO DE BUSCA (MODAL FAMÍLIA)
+// ================================================================
+function onEstadoChange() {
+  const uf = document.getElementById('f-estado').value;
+  fillCidades(uf, 'f-cidade');
+  document.getElementById('f-bairro').innerHTML='<option value="">Selecione o bairro</option>';
+  document.getElementById('f-bairro').disabled=true;
+  document.getElementById('f-escola').innerHTML='<option value="">Selecione a escola</option>';
+  document.getElementById('f-escola').disabled=true;
+}
+function onCidadeChange() {
+  const uf = document.getElementById('f-estado').value;
+  const cidade = document.getElementById('f-cidade').value;
+  fillBairros(uf, cidade, 'f-bairro');
+  document.getElementById('f-escola').innerHTML='<option value="">Selecione a escola</option>';
+  document.getElementById('f-escola').disabled=true;
+}
+function onBairroChange() {
+  const uf = document.getElementById('f-estado').value;
+  const cidade = document.getElementById('f-cidade').value;
+  const bairro = document.getElementById('f-bairro').value;
+  fillEscolas(uf, cidade, bairro, 'f-escola');
+}
+
+function applyFilters() {
+  renderDriverCards(DRIVERS);
+}
+
+function renderDriverCards(drivers) {
+  const container = document.getElementById('driverCards');
+  container.innerHTML = '';
+  drivers.forEach(d => {
+    const vagas = d.vagas > 0
+      ? `<span style="color:#2E7D32;font-size:11px;">(${d.vagas} vaga${d.vagas>1?'s':''})</span>`
+      : `<span style="color:#C62828;font-size:11px;">(Lotado)</span>`;
+    const badge = d.badge === 'pro'
+      ? `<span class="sm-van-badge badge-pro">✓ Verificado Pro</span>`
+      : d.badge === 'top'
+      ? `<span class="sm-van-badge badge-top">⭐ Mais bem avaliado</span>`
+      : '';
+    const av1 = ['sm-van-1','sm-van-2','sm-van-3'][d.id % 3];
+    container.innerHTML += `
+      <div class="sm-driver-card">
+        <div class="sm-van-placeholder ${av1}">${d.van}${badge}</div>
+        <div class="sm-card-body">
+          <div class="sm-driver-row">
+            <div class="sm-driver-av" style="background:linear-gradient(135deg,#FF613C,#FFC629);">${d.nome.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+            <div>
+              <div class="sm-driver-name">${d.nome}</div>
+              <div class="sm-driver-exp">${d.exp} de experiência · ${d.turno}</div>
+            </div>
+            <div class="sm-driver-rating">
+              <div class="sm-rating-num">⭐ ${d.av}</div>
+              <div class="sm-rating-count">(${d.rev} avaliações)</div>
+            </div>
+          </div>
+          <div class="sm-info-grid">
+            <div class="sm-info-item">
+              <div class="sm-info-label">🏫 Escolas atendidas</div>
+              <div class="sm-school-tags">${d.escolas.map(e=>`<span class="sm-school-tag">${e}</span>`).join('')}</div>
+            </div>
+            <div class="sm-info-item">
+              <div class="sm-info-label">👥 Capacidade</div>
+              <div class="sm-info-value">${d.cap} crianças máx ${vagas}</div>
+            </div>
+          </div>
+          <div class="sm-card-footer">
+            <div class="sm-price">
+              <div class="sm-price-label">Mensalidade</div>
+              <div class="sm-price-val">R$ ${d.preco},00</div>
+            </div>
+            <button class="sm-view-btn">Ver detalhes</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+// ================================================================
+// MOTORISTA — CADASTRO (estado/cidade/bairro)
+// ================================================================
+function onDrEstadoChange() {
+  const uf = document.getElementById('dr-estado').value;
+  fillCidades(uf, 'dr-cidade');
+  document.getElementById('dr-bairro').innerHTML='<option value="">Selecione</option>';
+  document.getElementById('dr-bairro').disabled=true;
+}
+function onDrCidadeChange() {
+  const uf = document.getElementById('dr-estado').value;
+  const cidade = document.getElementById('dr-cidade').value;
+  fillBairros(uf, cidade, 'dr-bairro');
+}
+
+// ROTAS DO MOTORISTA
+const rtBairros = [], rtEscolas = [];
+
+function onRtEstadoChange() {
+  const uf = document.getElementById('rt-estado').value;
+  fillCidades(uf, 'rt-cidade');
+  document.getElementById('rt-bairro').innerHTML='<option value="">Selecione um bairro para adicionar</option>';
+  document.getElementById('rt-bairro').disabled=true;
+  document.getElementById('rt-escola').innerHTML='<option value="">Selecione uma escola para adicionar</option>';
+  document.getElementById('rt-escola').disabled=true;
+}
+function onRtCidadeChange() {
+  const uf = document.getElementById('rt-estado').value;
+  const cidade = document.getElementById('rt-cidade').value;
+  fillBairros(uf, cidade, 'rt-bairro');
+  document.getElementById('rt-escola').innerHTML='<option value="">Selecione uma escola para adicionar</option>';
+  document.getElementById('rt-escola').disabled=true;
+}
+function addBairroRota() {
+  const sel = document.getElementById('rt-bairro');
+  const val = sel.value;
+  if (!val || rtBairros.includes(val)) return;
+  rtBairros.push(val);
+  renderRtTags('rt-bairros-list', rtBairros, () => {
+    const uf = document.getElementById('rt-estado').value;
+    const cidade = document.getElementById('rt-cidade').value;
+    fillEscolas(uf, cidade, val, 'rt-escola');
+  });
+  const uf = document.getElementById('rt-estado').value;
+  const cidade = document.getElementById('rt-cidade').value;
+  fillEscolas(uf, cidade, val, 'rt-escola');
+  sel.value = '';
+}
+function addEscolaRota() {
+  const sel = document.getElementById('rt-escola');
+  const val = sel.value;
+  if (!val || rtEscolas.includes(val)) return;
+  rtEscolas.push(val);
+  renderRtTags('rt-escolas-list', rtEscolas, null);
+  sel.value = '';
+}
+function renderRtTags(containerId, arr, onAdd) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = arr.map((item, i) => `
+    <span class="dm-selected-tag">${item}
+      <button onclick="removeRtItem('${containerId}',${i},'${arr === rtBairros ? 'b':'e'}')">×</button>
+    </span>`).join('');
+}
+function removeRtItem(containerId, idx, type) {
+  const arr = type === 'b' ? rtBairros : rtEscolas;
+  arr.splice(idx, 1);
+  renderRtTags(containerId, arr, null);
+}
+
+// ================================================================
+// MULTI-STEP FORM
+// ================================================================
+let currentStep = 1;
+
+function dmNext() {
+  if (currentStep === 4) {
+    if (!document.getElementById('termsCheck').checked) {
+      alert('Por favor, aceite os termos para concluir o cadastro.');
+      return;
+    }
+    document.getElementById('dm-footer').style.display = 'none';
+    document.querySelector('.dm-steps').style.display = 'none';
+    for (let i=1;i<=4;i++) document.getElementById('dm-step-'+i).style.display='none';
+    document.getElementById('dm-success').style.display = 'block';
+    return;
+  }
+  goToStep(currentStep + 1);
+}
+function dmPrev() { goToStep(currentStep - 1); }
+
+function goToStep(n) {
+  document.getElementById('dm-step-'+currentStep).style.display='none';
+  document.getElementById('step-dot-'+currentStep).classList.remove('active');
+  document.getElementById('step-dot-'+currentStep).classList.add('done');
+  currentStep = n;
+  document.getElementById('dm-step-'+currentStep).style.display='block';
+  document.getElementById('step-dot-'+currentStep).classList.remove('done');
+  document.getElementById('step-dot-'+currentStep).classList.add('active');
+  document.getElementById('cur-step').textContent = currentStep;
+  document.getElementById('dm-prev').style.display = currentStep > 1 ? 'inline-block' : 'none';
+  document.getElementById('dm-next').textContent = currentStep === 4 ? '✓ Enviar cadastro' : 'Próximo →';
+  document.querySelector('.dm-body').scrollTop = 0;
+}
+
+// ================================================================
+// FILE UPLOAD FEEDBACK
+// ================================================================
+function fileUploaded(input, statusId) {
+  const el = document.getElementById(statusId);
+  if (input.files && input.files.length > 0) {
+    el.textContent = '✓ Enviado';
+    el.style.color = '#2E7D32';
+  }
+}
+
+// ================================================================
+// MODAL CONTROLS
+// ================================================================
+function openSearchModal() {
+  document.getElementById('searchModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDriverCards(DRIVERS);
+}
+function closeSearchModal() {
+  document.getElementById('searchModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openDriverModal() {
+  document.getElementById('driverModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDriverModal() {
+  document.getElementById('driverModal').classList.remove('open');
+  document.body.style.overflow = '';
+  currentStep = 1;
+  for (let i=1;i<=4;i++) {
+    const dot = document.getElementById('step-dot-'+i);
+    dot.classList.remove('active','done');
+    document.getElementById('dm-step-'+i).style.display = i===1?'block':'none';
+  }
+  document.getElementById('step-dot-1').classList.add('active');
+  document.getElementById('dm-footer').style.display='flex';
+  document.querySelector('.dm-steps').style.display='flex';
+  document.getElementById('dm-success').style.display='none';
+  document.getElementById('dm-prev').style.display='none';
+  document.getElementById('dm-next').textContent='Próximo →';
+  document.getElementById('cur-step').textContent='1';
+}
+
+function handleOverlayClick(e, id) {
+  if (e.target === document.getElementById(id)) {
+    if (id === 'searchModal') closeSearchModal();
+    else closeDriverModal();
+  }
+}
+function toggleTag(el) { el.classList.toggle('active'); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSearchModal(); closeDriverModal(); }
+});
+
+// ================================================================
+// INIT
+// ================================================================
+window.addEventListener('DOMContentLoaded', () => {
+  fillEstados('f-estado');
+  fillEstados('dr-estado');
+  fillEstados('rt-estado');
+});
+</script>
+</body>
+</html>
